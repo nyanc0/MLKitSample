@@ -1,0 +1,27 @@
+*.iml
+.gradle
+/local.properties
+
+/.idea/libraries
+.DS_Store
+/build
+/captures
+
+bin/
+gen/
+.classpath
+.project
+proguard/
+*.ipr
+*.iws
+app/build/
+
+.idea/*.xml
+
+!.idea/gradle.xml
+!.idea/runConfigurations/*.xml
+
+# for firebase
+google-services.json
+
+
