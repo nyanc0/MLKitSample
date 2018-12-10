@@ -21,6 +21,8 @@ app/build/
 !.idea/gradle.xml
 !.idea/runConfigurations/*.xml
 
+/.idea/
+
 # for firebase
 google-services.json
 
