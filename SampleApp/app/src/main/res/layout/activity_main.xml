@@ -23,6 +23,35 @@
                     android:contentDescription="@null"
                     android:scaleType="centerCrop" />
 
+                <android.support.design.chip.ChipGroup
+                    android:id="@+id/chip_selection_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipSpacing="@dimen/activity_horizontal_margin"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/image"
+                    app:singleLine="true"
+                    app:singleSelection="true">
+
+                    <android.support.design.chip.Chip
+                        android:id="@+id/chip_cloud"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_cloud"
+                        app:chipBackgroundColor="@color/colorDivider" />
+
+                    <android.support.design.chip.Chip
+                        android:id="@+id/chip_device"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_device"
+                        app:chipBackgroundColor="@color/colorDivider" />
+
+                </android.support.design.chip.ChipGroup>
+
                 <TextView
                     android:id="@+id/detector_title"
                     android:layout_width="wrap_content"
@@ -33,7 +62,7 @@
                     android:textColor="@color/textPrimary"
                     android:textSize="@dimen/textSizeL"
                     android:textStyle="bold"
-                    app:layout_constraintTop_toBottomOf="@+id/image"
+                    app:layout_constraintTop_toBottomOf="@+id/chip_selection_container"
                     tools:text="Detector" />
 
                 <android.support.design.chip.ChipGroup

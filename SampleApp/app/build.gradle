@@ -64,6 +64,11 @@ dependencies {
     kapt 'com.google.dagger:dagger-compiler:2.16'
     kapt 'com.google.dagger:dagger-android-processor:2.16'
 
+    // camera
+    implementation 'com.camerakit:camerakit:1.0.0-beta3.10'
+    implementation 'com.camerakit:jpegkit:0.1.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
