@@ -17,6 +17,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -24,7 +25,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    dataBinding {
+        enabled = true
+    }
     packagingOptions {
         exclude 'META-INF/proguard/androidx-annotations.pro'
     }
@@ -44,6 +47,10 @@ dependencies {
 
     // firebase
     implementation 'com.google.firebase:firebase-core:16.0.4'
+
+    // Android Architecture Components
+    def lifecycle_version = "1.1.1"
+    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
 
     // MLKit
     // image
