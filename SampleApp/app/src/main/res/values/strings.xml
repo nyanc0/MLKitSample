@@ -6,4 +6,6 @@
 
     <string name="title_cloud">cloud</string>
     <string name="title_device">device</string>
+
+    <string name="message_no_camera_permission">カメラのパーミッションが許可されていません。</string>
 </resources>

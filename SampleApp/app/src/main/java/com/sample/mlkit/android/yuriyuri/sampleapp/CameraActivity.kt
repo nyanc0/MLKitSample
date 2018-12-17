@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.view.View
+import android.widget.Toast
 import com.google.android.cameraview.CameraView
 import com.sample.mlkit.android.yuriyuri.sampleapp.databinding.ActivityCameraBinding
 import com.sample.mlkit.android.yuriyuri.sampleapp.permission.Permission
@@ -19,6 +22,8 @@ class CameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
 
     @Inject
     lateinit var permissionUtil: PermissionUtil
+    private val REQUEST_CAMERA_PERMISSION = 1
+    private lateinit var backgroundHandler: Handler
 
     private val binding: ActivityCameraBinding by lazy {
         DataBindingUtil.setContentView<ActivityCameraBinding>(this, R.layout.activity_camera)
@@ -33,6 +38,9 @@ class CameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
         }
 
         override fun onPictureTaken(cameraView: CameraView, data: ByteArray) {
+            getBackgroundHandler().post {
+                
+            }
         }
 
     }
@@ -50,7 +58,7 @@ class CameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
             permissionUtil.showRationale(Permission.P_CAMERA) -> {
                 // TODO:show toast or dialog
             }
-            else -> permissionUtil.requestPermission(Permission.P_CAMERA, 200)
+            else -> permissionUtil.requestPermission(Permission.P_CAMERA, REQUEST_CAMERA_PERMISSION)
         }
     }
 
@@ -59,15 +67,29 @@ class CameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
         binding.camera.stop()
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_CAMERA_PERMISSION -> {
+                if (!permissionUtil.verifyGrantResults(grantResults)) {
+                    Toast.makeText(this, R.string.message_no_camera_permission, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.take_picture -> binding.camera.takePicture()
         }
     }
 
-
-
-
+    private fun getBackgroundHandler(): Handler {
+        val thread = HandlerThread("background")
+        thread.start()
+        backgroundHandler = Handler(thread.looper)
+        return backgroundHandler
+    }
 
     companion object {
         fun start(context: Context) {
