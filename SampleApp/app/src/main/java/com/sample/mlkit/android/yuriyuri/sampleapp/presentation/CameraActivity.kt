@@ -1,14 +1,14 @@
-package com.sample.mlkit.android.yuriyuri.sampleapp
+package com.sample.mlkit.android.yuriyuri.sampleapp.presentation
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
 import android.view.View
 import android.widget.Toast
-import com.google.android.cameraview.CameraView
+import com.otaliastudios.cameraview.CameraListener
+import com.sample.mlkit.android.yuriyuri.sampleapp.R
 import com.sample.mlkit.android.yuriyuri.sampleapp.databinding.ActivityCameraBinding
 import com.sample.mlkit.android.yuriyuri.sampleapp.permission.Permission
 import com.sample.mlkit.android.yuriyuri.sampleapp.permission.PermissionUtil
@@ -23,31 +23,25 @@ class CameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
     @Inject
     lateinit var permissionUtil: PermissionUtil
     private val REQUEST_CAMERA_PERMISSION = 1
-    private lateinit var backgroundHandler: Handler
 
     private val binding: ActivityCameraBinding by lazy {
         DataBindingUtil.setContentView<ActivityCameraBinding>(this, R.layout.activity_camera)
     }
 
-    private val cameraCallback = object : CameraView.Callback() {
-
-        override fun onCameraOpened(cameraView: CameraView?) {
+    private val cameraListener = object : CameraListener() {
+        override fun onPictureTaken(jpeg: ByteArray?) {
+            super.onPictureTaken(jpeg)
+                val intent = Intent()
+                intent.putExtra(KEY_INTENT, jpeg)
+                setResult(Activity.RESULT_OK, intent)
+                finish()
         }
-
-        override fun onCameraClosed(cameraView: CameraView?) {
-        }
-
-        override fun onPictureTaken(cameraView: CameraView, data: ByteArray) {
-            getBackgroundHandler().post {
-                
-            }
-        }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding.camera.addCallback(cameraCallback)
+        binding.camera.setLifecycleOwner(this)
+        binding.camera.addCameraListener(cameraListener)
         binding.takePicture.setOnClickListener(this)
     }
 
@@ -67,6 +61,11 @@ class CameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
         binding.camera.stop()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.camera.destroy()
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -80,22 +79,23 @@ class CameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v!!.id) {
-            R.id.take_picture -> binding.camera.takePicture()
+            R.id.take_picture -> binding.camera.capturePicture()
         }
     }
 
-    private fun getBackgroundHandler(): Handler {
-        val thread = HandlerThread("background")
-        thread.start()
-        backgroundHandler = Handler(thread.looper)
-        return backgroundHandler
-    }
-
     companion object {
+
+        const val REQUEST_CD = 200
+        const val KEY_INTENT = "key_image"
+
         fun start(context: Context) {
             val intent = Intent(context, CameraActivity::class.java)
             context.startActivity(intent)
         }
-    }
 
+        fun startForResult(activity: Activity) {
+            val intent = Intent(activity, CameraActivity::class.java)
+            activity.startActivityForResult(intent, REQUEST_CD)
+        }
+    }
 }

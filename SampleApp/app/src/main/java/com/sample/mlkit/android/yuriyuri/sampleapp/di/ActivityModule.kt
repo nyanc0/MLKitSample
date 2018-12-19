@@ -1,7 +1,8 @@
 package com.sample.mlkit.android.yuriyuri.sampleapp.di
 
-import com.sample.mlkit.android.yuriyuri.sampleapp.CameraActivity
-import com.sample.mlkit.android.yuriyuri.sampleapp.MainActivity
+import com.sample.mlkit.android.yuriyuri.sampleapp.presentation.CameraActivity
+import com.sample.mlkit.android.yuriyuri.sampleapp.presentation.CropActivity
+import com.sample.mlkit.android.yuriyuri.sampleapp.presentation.MainActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -16,4 +17,8 @@ interface ActivityModule {
     @ContributesAndroidInjector(modules = [
         CameraActivityModule::class])
     fun contributeCameraactivity(): CameraActivity
+
+    @ContributesAndroidInjector(modules = [
+        CropActivityModule::class])
+    fun contributeCropActivity(): CropActivity
 }

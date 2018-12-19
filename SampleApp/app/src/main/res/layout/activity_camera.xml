@@ -6,13 +6,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.cameraview.CameraView
+        <com.otaliastudios.cameraview.CameraView
             android:id="@+id/camera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
             android:adjustViewBounds="true"
             android:background="@android:color/black" />
 
@@ -20,8 +17,6 @@
             android:id="@+id/take_picture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
             android:layout_gravity="bottom|center"
             app:srcCompat="@drawable/ic_camera_alt_white_24dp"
             app:useCompatPadding="true" />

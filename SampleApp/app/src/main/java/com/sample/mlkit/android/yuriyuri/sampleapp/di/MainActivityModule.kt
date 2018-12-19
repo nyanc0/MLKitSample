@@ -1,7 +1,7 @@
 package com.sample.mlkit.android.yuriyuri.sampleapp.di
 
 import android.support.v7.app.AppCompatActivity
-import com.sample.mlkit.android.yuriyuri.sampleapp.MainActivity
+import com.sample.mlkit.android.yuriyuri.sampleapp.presentation.MainActivity
 import dagger.Binds
 import dagger.Module
 
