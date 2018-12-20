@@ -11,11 +11,12 @@
         <com.isseiaoki.simplecropview.CropImageView
             android:id="@+id/crop_image"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:padding="16dp"
             custom:scv_crop_mode="fit_image" />
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/crop_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"

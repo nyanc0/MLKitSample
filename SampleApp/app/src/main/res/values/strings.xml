@@ -8,4 +8,5 @@
     <string name="title_device">device</string>
 
     <string name="message_no_camera_permission">カメラのパーミッションが許可されていません。</string>
+    <string name="save_photo_file_name">IMG_%1$s.jpg</string>
 </resources>
