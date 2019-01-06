@@ -3,6 +3,8 @@ package com.sample.mlkit.android.yuriyuri.sampleapp.di
 import com.sample.mlkit.android.yuriyuri.sampleapp.presentation.CameraActivity
 import com.sample.mlkit.android.yuriyuri.sampleapp.presentation.CropActivity
 import com.sample.mlkit.android.yuriyuri.sampleapp.presentation.MainActivity
+import com.sample.mlkit.android.yuriyuri.sampleapp.presentation.bio.BioActivity
+import com.sample.mlkit.android.yuriyuri.sampleapp.presentation.top.TopActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -21,4 +23,12 @@ interface ActivityModule {
     @ContributesAndroidInjector(modules = [
         CropActivityModule::class])
     fun contributeCropActivity(): CropActivity
+
+    @ContributesAndroidInjector(modules = [
+        TopActivityModule::class])
+    fun contributeTopActivity(): TopActivity
+
+    @ContributesAndroidInjector(modules = [
+        BioActivityModule::class])
+    fun contributeBioActivity(): BioActivity
 }

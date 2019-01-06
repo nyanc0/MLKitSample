@@ -75,6 +75,8 @@ fun createTimeStamp(time: Long): String = SimpleDateFormat("yyyyMMdd_HHmmss", Lo
 
 fun createPreCroppedFileName(title: String): String = "IMG_" + title + "_pre_cropped" + ".jpg"
 
+fun createSaveFile(fileName: String, file: File) = File(file, fileName)
+
 fun createSaveFileName(title: String): String = "IMG_" + title + "_cropped" + ".jpg"
 
 fun isFileExist(file: File) = file.exists()

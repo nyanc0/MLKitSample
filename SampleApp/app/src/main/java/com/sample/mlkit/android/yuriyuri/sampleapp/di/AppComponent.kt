@@ -12,7 +12,8 @@ import javax.inject.Singleton
 @Component(modules = [
     AndroidSupportInjectionModule::class,
     AppModule::class,
-    ActivityModule::class])
+    ActivityModule::class,
+    ViewModelModule::class])
 interface AppComponent : AndroidInjector<MLKitApp> {
 
     @Component.Builder
