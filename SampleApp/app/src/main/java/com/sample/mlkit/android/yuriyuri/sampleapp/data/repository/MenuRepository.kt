@@ -1,13 +1,9 @@
 package com.sample.mlkit.android.yuriyuri.sampleapp.data.repository
 
 import com.sample.mlkit.android.yuriyuri.sampleapp.model.ContentSet
-import com.sample.mlkit.android.yuriyuri.sampleapp.util.SchedulerProvider
 import io.reactivex.Single
-import javax.inject.Inject
 
-class MenuRepository @Inject constructor(
-        private val appSchedulerProvider: SchedulerProvider
-) {
+class MenuRepository {
     /**
      * メニューのリストを返す.
      */

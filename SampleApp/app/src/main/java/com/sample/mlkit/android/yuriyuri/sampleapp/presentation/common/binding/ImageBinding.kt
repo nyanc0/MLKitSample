@@ -1,6 +1,6 @@
 package com.sample.mlkit.android.yuriyuri.sampleapp.presentation.common.binding
 
-import android.databinding.BindingAdapter
+import androidx.databinding.BindingAdapter
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 

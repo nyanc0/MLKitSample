@@ -1,8 +1,8 @@
 package com.sample.mlkit.android.yuriyuri.sampleapp.presentation.top
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.sample.mlkit.android.yuriyuri.sampleapp.data.Result
 import com.sample.mlkit.android.yuriyuri.sampleapp.data.repository.MenuRepository
 import com.sample.mlkit.android.yuriyuri.sampleapp.model.ContentSet
@@ -11,9 +11,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import toResult
-import javax.inject.Inject
 
-class TopActivityViewModel @Inject constructor(private val schedulerProvider: SchedulerProvider, private val repository: MenuRepository)
+class TopActivityViewModel constructor(private val schedulerProvider: SchedulerProvider, private val repository: MenuRepository)
     : ViewModel() {
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -34,8 +33,7 @@ class TopActivityViewModel @Inject constructor(private val schedulerProvider: Sc
                 ).addTo(compositeDisposable)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposable.clear()
+    fun onDestroy() {
+        compositeDisposable.dispose()
     }
 }

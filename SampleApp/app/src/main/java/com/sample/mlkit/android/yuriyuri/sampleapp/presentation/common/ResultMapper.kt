@@ -1,4 +1,4 @@
-import android.support.annotation.CheckResult
+import androidx.annotation.CheckResult
 import com.sample.mlkit.android.yuriyuri.sampleapp.data.Result
 import com.sample.mlkit.android.yuriyuri.sampleapp.util.SchedulerProvider
 import io.reactivex.Completable

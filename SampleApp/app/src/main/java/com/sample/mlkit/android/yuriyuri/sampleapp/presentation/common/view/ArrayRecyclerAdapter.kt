@@ -1,10 +1,10 @@
 package com.sample.mlkit.android.yuriyuri.sampleapp.presentation.common.view
 
-import android.support.annotation.UiThread
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.UiThread
+import androidx.recyclerview.widget.RecyclerView
 
-abstract class ArrayRecyclerAdapter<T, VH : RecyclerView.ViewHolder>
-constructor(var list: ArrayList<T>) : RecyclerView.Adapter<VH>() {
+abstract class ArrayRecyclerAdapter<T, VH : androidx.recyclerview.widget.RecyclerView.ViewHolder>
+constructor(var list: ArrayList<T>) : androidx.recyclerview.widget.RecyclerView.Adapter<VH>() {
 
     @UiThread
     fun reset(items: Collection<T>) {
