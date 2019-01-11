@@ -7,7 +7,7 @@ package com.sample.mlkit.android.yuriyuri.sampleapp.presentation
 //    private var handler: Handler = Handler()
 //
 //    private val binding: ActivityCameraBinding by lazy {
-//        DataBindingUtil.setContentView<ActivityCameraBinding>(this, R.layout.activity_camera)
+//        DataBindingUtil.setContentView<ActivityCameraBinding>(this, R.layout.fragment_camera)
 //    }
 //
 //    private val cameraListener = object : CameraListener() {

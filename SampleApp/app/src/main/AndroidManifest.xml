@@ -28,9 +28,9 @@
 
         <activity android:name=".presentation.bio.BioActivity"/>
 
-        <activity android:name=".presentation.MainActivity" />
-        <activity android:name=".presentation.CameraActivity" />
-        <activity android:name=".presentation.CropActivity" />
+        <!--<activity android:name=".presentation.MainActivity" />-->
+        <!--<activity android:name=".presentation.CameraActivity" />-->
+        <!--<activity android:name=".presentation.CropActivity" />-->
     </application>
 
 </manifest>

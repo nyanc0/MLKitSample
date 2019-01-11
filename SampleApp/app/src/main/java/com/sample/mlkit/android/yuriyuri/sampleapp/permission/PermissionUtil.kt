@@ -1,10 +1,10 @@
 package com.sample.mlkit.android.yuriyuri.sampleapp.permission
 
+import android.app.Activity
 import android.os.Build
 import androidx.core.content.PermissionChecker
-import androidx.appcompat.app.AppCompatActivity
 
-class PermissionUtil constructor(private val activity: AppCompatActivity) {
+class PermissionUtil constructor(private val activity: Activity) {
 
     /**
      * すでにパーミッションが得られているかチェック(単体)

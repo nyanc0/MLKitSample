@@ -9,4 +9,10 @@
 
     <string name="message_no_camera_permission">カメラのパーミッションが許可されていません。</string>
     <string name="save_photo_file_name">IMG_%1$s.jpg</string>
+
+    <string name="message_incompatible">認証非対応です</string>
+    <string name="message_failed">認証に失敗しました</string>
+    <string name="message_success">認証に成功しました</string>
+    <string name="message_unauthenticated">未認証です</string>
+
 </resources>

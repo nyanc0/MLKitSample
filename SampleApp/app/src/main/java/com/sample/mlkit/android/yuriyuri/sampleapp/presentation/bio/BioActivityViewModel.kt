@@ -6,21 +6,30 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import java.security.*
 import java.security.spec.ECGenParameterSpec
 
 
-class BioActivityViewModel : ViewModel() {
+class BioActivityViewModel : ViewModel(), LifecycleObserver {
 
-
+    /**
+     * BiometricPromptを利用できるSDKかチェック
+     */
     fun isTargetSDK(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
 
-    private fun isSupportBiometricPrompt(context: Context): Boolean {
+    /**
+     * 生体認証をサポートしているデバイスかのチェック
+     */
+    fun isSupportBiometricPrompt(context: Context): Boolean {
         val packageManager = context.packageManager
         return packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)
     }
 
+    /**
+     * 認証に利用するKeyPairを生成する
+     */
     @Throws(Exception::class)
     @TargetApi(Build.VERSION_CODES.P)
     fun generateKeyPair(keyName: String, invalidatedByBiometricEnrollment: Boolean): KeyPair {
@@ -40,6 +49,9 @@ class BioActivityViewModel : ViewModel() {
         return keyPairGenerator.generateKeyPair()
     }
 
+    /**
+     * KeyStoreから生成したKeyPairを取得する
+     */
     @Throws(Exception::class)
     private fun getKeyPair(keyName: String): KeyPair? {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
@@ -55,6 +67,9 @@ class BioActivityViewModel : ViewModel() {
         return null
     }
 
+    /**
+     * Signatureの初期化
+     */
     @Throws(Exception::class)
     fun initSignature(keyName: String): Signature? {
         val keyPair = getKeyPair(keyName)
