@@ -12,6 +12,16 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
 
+        <provider
+                android:authorities="${applicationId}.fileprovider"
+                android:name="androidx.core.content.FileProvider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/provider_paths"/>
+        </provider>
+
         <activity android:name=".presentation.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -20,6 +30,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".presentation.crop.CropActivity"/>
 
         <meta-data
                 android:name="com.google.firebase.ml.vision.DEPENDENCIES"

@@ -1,4 +1,4 @@
-package com.sample.mlkit.android.nyanc0.mlkitsample.presentation
+package com.sample.mlkit.android.nyanc0.mlkitsample.presentation.bottomsheet
 
 import android.content.Context
 import android.os.Bundle
@@ -14,7 +14,8 @@ import com.sample.mlkit.android.nyanc0.mlkitsample.R
 import com.sample.mlkit.android.nyanc0.mlkitsample.databinding.DialogBottomSheetBinding
 import com.sample.mlkit.android.nyanc0.mlkitsample.model.ImageSelection
 
-class BottomSheetFragment : BottomSheetDialogFragment(), ImageSelectionAdapter.OnItemClickListener {
+class BottomSheetFragment : BottomSheetDialogFragment(),
+    ImageSelectionAdapter.OnItemClickListener {
 
     lateinit var listener: OnItemSelectedListener
     lateinit var binding: DialogBottomSheetBinding
@@ -40,7 +41,10 @@ class BottomSheetFragment : BottomSheetDialogFragment(), ImageSelectionAdapter.O
         )
         binding.imageSelectionList.layoutManager = LinearLayoutManager(context)
         binding.imageSelectionList.adapter =
-                ImageSelectionAdapter(imageSelectionList, this)
+                ImageSelectionAdapter(
+                    imageSelectionList,
+                    this
+                )
     }
 
     override fun onItemClicked(item: ImageSelection) {

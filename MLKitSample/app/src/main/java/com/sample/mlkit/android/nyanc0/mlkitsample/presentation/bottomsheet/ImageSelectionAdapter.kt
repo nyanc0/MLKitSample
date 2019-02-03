@@ -1,4 +1,4 @@
-package com.sample.mlkit.android.nyanc0.mlkitsample.presentation
+package com.sample.mlkit.android.nyanc0.mlkitsample.presentation.bottomsheet
 
 import android.view.ViewGroup
 import com.sample.mlkit.android.nyanc0.mlkitsample.R

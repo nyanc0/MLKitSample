@@ -6,4 +6,5 @@
     <color name="textOn">#fafafa</color>
     <color name="textPrimary">#212121</color>
     <color name="textSecondary">#757575</color>
+    <color name="black">#000000</color>
 </resources>

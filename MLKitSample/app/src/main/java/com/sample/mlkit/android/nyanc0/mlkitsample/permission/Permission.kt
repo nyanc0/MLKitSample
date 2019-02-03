@@ -6,7 +6,9 @@ import android.text.TextUtils
 enum class Permission(val permission: String) {
 
     // CAMERA
-    P_CAMERA(Manifest.permission.CAMERA);
+    P_CAMERA(Manifest.permission.CAMERA),
+    P_WRITE_EXTERNAL_STORAGE(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+    P_READ_EXTERNAL_STORAGE(Manifest.permission.READ_EXTERNAL_STORAGE);
 
     companion object {
         fun get(permission: String): Permission? {
