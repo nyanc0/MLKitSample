@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+                name="selecion"
+                type="com.sample.mlkit.android.nyanc0.mlkitsample.model.ImageSelection"/>
+    </data>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/textOn"
+            android:padding="8dp">
+
+        <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{selecion.title}"
+                android:textSize="@dimen/textM"
+                android:textColor="@color/textPrimary"
+                android:gravity="center"
+                android:textStyle="bold"
+                tools:text="hoge"/>
+    </LinearLayout>
+</layout>
