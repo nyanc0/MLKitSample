@@ -1,5 +1,6 @@
 package com.sample.mlkit.android.nyanc0.mlkitsample.presentation
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -19,6 +20,7 @@ import com.sample.mlkit.android.nyanc0.mlkitsample.permission.requestPermission
 import com.sample.mlkit.android.nyanc0.mlkitsample.permission.showRationale
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.bottomsheet.BottomSheetFragment
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.createFile
+import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.crop.CropActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -68,7 +70,12 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             RESULT_CAMERA -> {
-
+                // TODO:start cropp
+            }
+            CropActivity.REQUEST_CD -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.d("TEST", "RESULT OK!!")
+                }
             }
         }
     }
