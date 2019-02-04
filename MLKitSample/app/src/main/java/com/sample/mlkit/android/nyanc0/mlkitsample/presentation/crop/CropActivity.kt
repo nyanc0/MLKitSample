@@ -3,8 +3,8 @@ package com.sample.mlkit.android.nyanc0.mlkitsample.presentation.crop
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -12,21 +12,20 @@ import com.isseiaoki.simplecropview.callback.CropCallback
 import com.isseiaoki.simplecropview.callback.LoadCallback
 import com.sample.mlkit.android.nyanc0.mlkitsample.R
 import com.sample.mlkit.android.nyanc0.mlkitsample.databinding.ActivityCropBinding
-import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.createFile
-import kotlinx.coroutines.*
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
+import com.sample.mlkit.android.nyanc0.mlkitsample.model.Photo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnClickListener, CoroutineScope {
 
-    lateinit var loadUri: Uri
-    lateinit var job: Job
+    private lateinit var temPhoto: Photo
+    private lateinit var job: Job
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
-    lateinit var file: File
-    lateinit var croppedUri: Uri
+    private lateinit var croppedPhoto: Photo
 
     private val binding: ActivityCropBinding by lazy {
         DataBindingUtil.setContentView<ActivityCropBinding>(this, R.layout.activity_crop)
@@ -35,10 +34,15 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        loadUri = intent.getParcelableExtra(KEY_INTENT)
-        binding.cropImage.load(loadUri).execute(this)
+        job = Job()
+        // トリミングする写真を取得
+        temPhoto = intent.getParcelableExtra(KEY_INTENT)
+
+        Log.d("MLKit debug", "tempPhoto Intent:" + temPhoto.filePath)
+        Log.d("MLKit debug", "tempPhoto uri:" + temPhoto.fileUri.encodedPath)
+        binding.cropImage.load(temPhoto.fileUri).execute(this)
         binding.rollBtn.setOnClickListener(this)
-        binding.cropImage.setOnClickListener(this)
+        binding.cropBtn.setOnClickListener(this)
     }
 
     /**
@@ -67,25 +71,28 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
 
     private fun saveImage(cropped: Bitmap?) {
         launch {
-            croppedUri = withContext(Dispatchers.Default) {
-                val byteArrayOutputSystem = ByteArrayOutputStream()
-                cropped!!.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputSystem)
-                byteArrayOutputSystem.close()
+//            croppedPhoto = withContext(Dispatchers.Default) {
 
-                val file = createFile("nyanc0_cropped_")
-                val fileOutputStream = FileOutputStream(file)
-                fileOutputStream.write(byteArrayOutputSystem.toByteArray())
-                fileOutputStream.close()
-
-                // TODO:delete file
-
-                Uri.fromFile(file)
-            }
-
-            val intent = Intent()
-            intent.putExtra(KEY_RESULT_INTENT, croppedUri)
-            setResult(Activity.RESULT_OK)
-            finish()
+//                val byteArrayOutputSystem = ByteArrayOutputStream()
+//                cropped!!.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputSystem)
+//                byteArrayOutputSystem.close()
+//
+//                // トリミング前の写真を削除
+//                deleteExistFile(temPhoto.file)
+//
+//                // トリミングした写真を保存
+//                croppedPhoto = Photo(Photo.createTmpFile("nyanc0_cropped_"))
+//                val fileOutputStream = FileOutputStream(croppedPhoto.file)
+//                fileOutputStream.write(byteArrayOutputSystem.toByteArray())
+//                fileOutputStream.close()
+//            }
+//
+//            Log.d("MLKit debug", "croppedUri" + croppedUri.encodedPath)
+//
+//            val intent = Intent()
+//            intent.putExtra(KEY_RESULT_INTENT, croppedUri)
+//            setResult(Activity.RESULT_OK)
+//            finish()
         }
     }
 
@@ -93,7 +100,7 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
      * 画像をトリミング
      */
     private fun cropImage() {
-        binding.cropImage.crop(loadUri).execute(this)
+        binding.cropImage.crop(temPhoto.fileUri).execute(this)
     }
 
     companion object {
@@ -101,9 +108,9 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
         const val KEY_INTENT = "key_crop_image"
         const val KEY_RESULT_INTENT = "key_cropped_image"
 
-        fun startForResult(activity: Activity, uri: Uri) {
+        fun startForResult(activity: Activity, photo: Photo) {
             val intent = Intent(activity, CropActivity::class.java)
-            intent.putExtra(KEY_INTENT, uri)
+            intent.putExtra(KEY_INTENT, photo)
             activity.startActivityForResult(intent, REQUEST_CD)
         }
     }

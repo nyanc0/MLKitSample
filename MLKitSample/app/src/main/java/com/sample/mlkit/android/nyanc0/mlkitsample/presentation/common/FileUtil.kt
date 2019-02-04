@@ -15,3 +15,12 @@ fun createFile(prefix: String): File {
     return File.createTempFile(imageFileName, ".jpg", storageDir)
 }
 
+fun deleteExistFile(file: File) {
+    if (isFileExist(file)) {
+        file.delete()
+    }
+}
+
+fun isFileExist(file: File): Boolean {
+    return file.exists()
+}
