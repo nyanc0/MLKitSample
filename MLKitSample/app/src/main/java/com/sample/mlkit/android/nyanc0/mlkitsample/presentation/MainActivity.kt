@@ -25,6 +25,7 @@ import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedListener, CoroutineScope {
 
+    /** カメラ/ライブラリから取得した写真 */
     private lateinit var tmpPhoto: Photo
     private lateinit var job: Job
     override val coroutineContext: CoroutineContext
@@ -56,9 +57,17 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            RESULT_CAMERA -> {
+            REQUEST_CAMERA -> {
                 if (resultCode == Activity.RESULT_OK) {
                     CropActivity.startForResult(this, tmpPhoto)
+                }
+            }
+            REQUEST_CHOOSE_IMAGE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    data?.data?.let {
+                        tmpPhoto = Photo.createPhoto(it)
+                        CropActivity.startForResult(this, tmpPhoto)
+                    }
                 }
             }
             CropActivity.REQUEST_CD -> {
@@ -78,35 +87,51 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
     }
 
     /**
-     * カメラ起動
+     * カメラ許可チェック
      */
-    private fun startCamera() {
+    private fun checkCameraPermission(): Boolean {
         if (!isAuthrized(Permission.P_WRITE_EXTERNAL_STORAGE, this)) {
             if (!showRationale(Permission.P_WRITE_EXTERNAL_STORAGE, this)) {
                 requestPermission(Permission.P_WRITE_EXTERNAL_STORAGE, REQUEST_PERMISSION, this)
             } else {
                 Toast.makeText(this, "許可してください", Toast.LENGTH_SHORT).show()
             }
+            return false
+        }
+        return true
+    }
+
+    /**
+     * カメラ起動
+     */
+    private fun startCamera() {
+        if (!checkCameraPermission()) {
             return
         }
 
-        tmpPhoto = Photo(Photo.createTmpFile(TMP_PHOTO_PREFIX))
-
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, tmpPhoto.fileUri)
-        startActivityForResult(intent, RESULT_CAMERA)
+        tmpPhoto = Photo.createPhoto(TMP_PHOTO_PREFIX).apply {
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, this.fileUri)
+            startActivityForResult(intent, REQUEST_CAMERA)
+        }
     }
 
     /**
      * ライブラリ起動
      */
     private fun startLibrary() {
-
+        val intent = Intent().apply {
+            type = "image/jpeg"
+            action = Intent.ACTION_OPEN_DOCUMENT
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CHOOSE_IMAGE)
     }
 
     companion object {
         const val REQUEST_PERMISSION = 1000
-        const val RESULT_CAMERA = 1001
+        const val REQUEST_CAMERA = 1001
+        const val REQUEST_CHOOSE_IMAGE = 1002
         const val TMP_PHOTO_PREFIX = "nyanc0_"
     }
 }

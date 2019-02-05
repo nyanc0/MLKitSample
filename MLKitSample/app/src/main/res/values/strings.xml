@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MLKitSample</string>
+
+    <string name="cropped_error">トリミングに失敗しました</string>
 </resources>

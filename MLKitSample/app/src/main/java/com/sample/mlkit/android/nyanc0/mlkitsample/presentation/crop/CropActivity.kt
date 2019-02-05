@@ -5,8 +5,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.isseiaoki.simplecropview.CropImageView
 import com.isseiaoki.simplecropview.callback.CropCallback
 import com.isseiaoki.simplecropview.callback.LoadCallback
 import com.sample.mlkit.android.nyanc0.mlkitsample.R
@@ -32,19 +34,16 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         job = Job()
+
         // トリミングする写真を取得
         temPhoto = intent.getParcelableExtra(KEY_INTENT)
 
         binding.cropImage.load(temPhoto.fileUri).execute(this)
-        binding.rollBtn.setOnClickListener(this)
+        binding.rotationBtn.setOnClickListener(this)
         binding.cropBtn.setOnClickListener(this)
     }
 
-    /**
-     * {@link LoadCallback}
-     */
     override fun onSuccess() {
         // do nothing
     }
@@ -55,7 +54,7 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
     }
 
     override fun onError(e: Throwable?) {
-        // TODO:show Error
+        Toast.makeText(this, resources.getString(R.string.cropped_error), Toast.LENGTH_SHORT).show()
     }
 
     override fun onClick(v: View?) {
@@ -63,7 +62,24 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
             R.id.crop_btn -> {
                 cropImage()
             }
+            R.id.rotation_btn -> {
+                rotateImage()
+            }
         }
+    }
+
+    /**
+     * 画像トリミング
+     */
+    private fun cropImage() {
+        binding.cropImage.crop(temPhoto.fileUri).execute(this)
+    }
+
+    /**
+     * 画像を回転
+     */
+    private fun rotateImage() {
+        binding.cropImage.rotateImage(CropImageView.RotateDegrees.ROTATE_90D)
     }
 
     /**
@@ -73,6 +89,7 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
      */
     private fun returnCroppedPhoto(cropped: Bitmap?) = launch(Dispatchers.Main) {
         val savedPhoto: Photo = saveImage(cropped).await()
+
         val intent = Intent()
         intent.putExtra(KEY_RESULT_INTENT, savedPhoto)
         setResult(Activity.RESULT_OK, intent)
@@ -96,16 +113,9 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
         fileOutputStream.close()
 
         // トリミング前の写真を削除
-        deleteExistFile(temPhoto.file)
+        deleteExistFile(temPhoto.photoFile)
 
-        return@async Photo(saveFile)
-    }
-
-    /**
-     * 画像をトリミング
-     */
-    private fun cropImage() {
-        binding.cropImage.crop(temPhoto.fileUri).execute(this)
+        return@async Photo.createPhoto(saveFile)
     }
 
     companion object {
