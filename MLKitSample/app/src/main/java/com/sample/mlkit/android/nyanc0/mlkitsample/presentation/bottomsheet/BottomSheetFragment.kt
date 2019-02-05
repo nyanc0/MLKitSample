@@ -17,8 +17,8 @@ import com.sample.mlkit.android.nyanc0.mlkitsample.model.ImageSelection
 class BottomSheetFragment : BottomSheetDialogFragment(),
     ImageSelectionAdapter.OnItemClickListener {
 
-    lateinit var listener: OnItemSelectedListener
-    lateinit var binding: DialogBottomSheetBinding
+    private lateinit var listener: OnItemSelectedListener
+    private lateinit var binding: DialogBottomSheetBinding
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -87,6 +87,6 @@ class BottomSheetFragment : BottomSheetDialogFragment(),
             return BottomSheetFragment()
         }
 
-        val TAG = BottomSheetFragment::class.java.canonicalName
+        val TAG = BottomSheetFragment::class.java.canonicalName!!
     }
 }
