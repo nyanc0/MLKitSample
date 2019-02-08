@@ -8,6 +8,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 
+
 class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private val lock = Any()
@@ -48,8 +49,33 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
         postInvalidate()
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        
+        synchronized(lock) {
+            for (graphic in graphics) {
+                when (graphic) {
+                    is BoxGraphic -> {
+                        rect.set(graphic.boundingBox)
+                        rect.offset(0.5f, 0.5f)
+                        canvas.drawRect(rect, rectPaint)
+
+                        if (graphic.text.isNotEmpty()) {
+                            canvas.drawText(graphic.text, rect.left, rect.bottom, textPaint)
+                        }
+                    }
+                    is TextGraphic -> {
+                        val offset = textPaint.textSize * 1.5f
+                        val left = textPaint.textSize * 0.5f
+                        var bottom = offset
+                        for (text in graphic.texts) {
+                            if (text.isNotEmpty()) {
+                                canvas.drawText(text, left, bottom, textPaint)
+                                bottom += offset
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
