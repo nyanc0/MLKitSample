@@ -44,6 +44,11 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
         binding.cropBtn.setOnClickListener(this)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+    }
+
     override fun onSuccess() {
         // do nothing
     }
