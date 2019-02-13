@@ -19,15 +19,21 @@ import com.sample.mlkit.android.nyanc0.mlkitsample.model.Photo
 import com.sample.mlkit.android.nyanc0.mlkitsample.permission.*
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.bottomsheet.BottomSheetFragment
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.crop.CropActivity
+import com.sample.mlkit.android.nyanc0.mlkitsample.repository.FirebaseRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedListener, CoroutineScope, AdapterView.OnItemSelectedListener {
+class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedListener, CoroutineScope,
+    AdapterView.OnItemSelectedListener {
 
     /** カメラ/ライブラリから取得した写真 */
     private lateinit var tmpPhoto: Photo
+    /** トリミング後の画像 */
+    private lateinit var croppedPhoto: Photo
+    /** 選択中のDetector */
+    private var selectedDetector: Detector = Detector.TEXT_DETECTION
     private lateinit var job: Job
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
@@ -49,6 +55,10 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
                         setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     }
         binding.detectorSpinner.onItemSelectedListener = this
+
+        binding.detectBtn.setOnClickListener {
+            val firebaseRepository = FirebaseRepository(coroutineContext)
+        }
     }
 
     override fun onItemSelected(item: ImageSelection) {
@@ -63,7 +73,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-
+        selectedDetector = Detector.getDetector(binding.detectorSpinner.selectedItem as String)
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -88,7 +98,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             }
             CropActivity.REQUEST_CD -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val croppedPhoto: Photo = data!!.getParcelableExtra(CropActivity.KEY_RESULT_INTENT)
+                    croppedPhoto = data!!.getParcelableExtra(CropActivity.KEY_RESULT_INTENT)
                     Glide.with(binding.mainImage.context).load(croppedPhoto.fileUri).into(binding.mainImage)
                 }
             }

@@ -30,6 +30,6 @@ sealed class Result<T>(val inProgress: Boolean) {
 
         fun <T> success(data: T): Result<T> = Success(data)
 
-        fun <T> failure(errorMessage: String, e: Throwable): Result<T> = Failure(errorMessage, e)
+        fun <T> failure(errorMessage: String?, e: Throwable): Result<T> = Failure(errorMessage, e)
     }
 }

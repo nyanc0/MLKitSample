@@ -1,5 +1,7 @@
 package com.sample.mlkit.android.nyanc0.mlkitsample.model
 
+import android.text.TextUtils
+
 enum class Detector(val title: String) {
     TEXT_DETECTION("テキスト認証"),
     CLOUD_TEXT_DETECTION("クラウドテキスト認証"),
@@ -17,5 +19,15 @@ enum class Detector(val title: String) {
             }
             return titleList
         }
+
+        fun getDetector(value: String): Detector {
+            for (detector in Detector.values()) {
+                if (TextUtils.equals(detector.title, value)) {
+                    return detector
+                }
+            }
+            return TEXT_DETECTION
+        }
+
     }
 }
