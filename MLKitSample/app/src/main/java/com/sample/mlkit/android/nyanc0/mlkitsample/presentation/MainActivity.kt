@@ -20,9 +20,12 @@ import com.sample.mlkit.android.nyanc0.mlkitsample.permission.*
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.bottomsheet.BottomSheetFragment
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.crop.CropActivity
 import com.sample.mlkit.android.nyanc0.mlkitsample.repository.FirebaseRepository
+import com.sample.mlkit.android.nyanc0.mlkitsample.repository.Result
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedListener, CoroutineScope,
@@ -57,7 +60,21 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         binding.detectorSpinner.onItemSelectedListener = this
 
         binding.detectBtn.setOnClickListener {
-            val firebaseRepository = FirebaseRepository(coroutineContext)
+            launch(Dispatchers.Main) {
+                val firebaseRepository = FirebaseRepository(coroutineContext)
+                val result = firebaseRepository.detect(croppedPhoto, selectedDetector).await()
+                binding.overlay.clear()
+                when (result) {
+                    is Result.Success -> {
+                        for (graphic in result.data) {
+                            overlay.add(graphic)
+                        }
+                    }
+                    is Result.Failure -> {
+                        Toast.makeText(this@MainActivity, result.errorMessage, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
 
@@ -151,11 +168,14 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             return
         }
 
-        tmpPhoto = Photo.createPhoto(TMP_PHOTO_PREFIX).apply {
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, this.fileUri)
-            startActivityForResult(intent, REQUEST_CAMERA)
+        tmpPhoto = Photo.createPhoto(TMP_PHOTO_PREFIX)
+
+        val intent = Intent().apply {
+            action = MediaStore.ACTION_IMAGE_CAPTURE
+            this.putExtra(MediaStore.EXTRA_OUTPUT, tmpPhoto.fileUri)
         }
+
+        startActivityForResult(intent, REQUEST_CAMERA)
     }
 
     /**

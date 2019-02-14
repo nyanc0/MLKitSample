@@ -1,23 +1,28 @@
 package com.sample.mlkit.android.nyanc0.mlkitsample.repository
 
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.cloud.FirebaseVisionCloudDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.text.FirebaseVisionCloudTextRecognizerOptions
 import com.sample.mlkit.android.nyanc0.mlkitsample.model.Detector
+import com.sample.mlkit.android.nyanc0.mlkitsample.model.Photo
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.BoxGraphic
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.Graphic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import java.io.FileInputStream
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class FirebaseRepository(override val coroutineContext: CoroutineContext) : CoroutineScope {
 
-    fun detect(bitmap: Bitmap, detector: Detector) = async(Dispatchers.Default) {
+    fun detect(photo: Photo, detector: Detector) = async(Dispatchers.Default) {
+
+        val inputStream = FileInputStream(photo.photoFile)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
 
         val image = FirebaseVisionImage.fromBitmap(bitmap)
         val firebaseVision = FirebaseVision.getInstance()
