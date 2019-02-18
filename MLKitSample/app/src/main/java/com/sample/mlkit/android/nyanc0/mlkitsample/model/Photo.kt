@@ -34,6 +34,15 @@ data class Photo(private val file: File,private val uri: Uri) : Parcelable {
                 storageDir.mkdir()
             }
             return File.createTempFile(prefix + timeStamp, ".jpg", storageDir)
+//            mMediaFileDto.fileName = getString(R.string.save_photo_file_name, mMediaFileDto.title)
+//            mMediaFileDto.path = (FileUtil.getExternalStorageDirPath("/Carsensor") + "/"
+//                    + mMediaFileDto.fileName)
+//
+//            return FileProvider.getUriForFile(
+//                this,
+//                BuildConfig.APPLICATION_ID + ".fileprovider",
+//                File(mMediaFileDto.path)
+//            )
         }
 
         private fun createUri(file: File): Uri {
@@ -57,19 +66,19 @@ data class Photo(private val file: File,private val uri: Uri) : Parcelable {
         fun createPhoto(file: File) : Photo {
             return Photo(file, createUri(file))
         }
+    }
 
-        @JvmField
-        val CREATOR: Parcelable.Creator<Photo> = object : Parcelable.Creator<Photo> {
-            override fun createFromParcel(`in`: Parcel): Photo {
-                return Photo(
-                    `in`.readValue(File::class.java.classLoader) as File
-                    , `in`.readValue(Uri::class.java.classLoader) as Uri
-                )
-            }
+    @JvmField
+    val CREATOR: Parcelable.Creator<Photo> = object : Parcelable.Creator<Photo> {
+        override fun createFromParcel(`in`: Parcel): Photo {
+            return Photo(
+                `in`.readValue(File::class.java.classLoader) as File
+                , `in`.readValue(Uri::class.java.classLoader) as Uri
+            )
+        }
 
-            override fun newArray(size: Int): Array<Photo?> {
-                return arrayOfNulls(size)
-            }
+        override fun newArray(size: Int): Array<Photo?> {
+            return arrayOfNulls(size)
         }
     }
 }

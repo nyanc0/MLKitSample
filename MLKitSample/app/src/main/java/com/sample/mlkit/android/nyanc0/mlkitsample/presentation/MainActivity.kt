@@ -172,6 +172,8 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
 
         val intent = Intent().apply {
             action = MediaStore.ACTION_IMAGE_CAPTURE
+            flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+            addCategory(Intent.CATEGORY_DEFAULT)
             this.putExtra(MediaStore.EXTRA_OUTPUT, tmpPhoto.fileUri)
         }
 
@@ -188,7 +190,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         }
 
         val intent = Intent().apply {
-            type = "image/jpeg"
+            type = "image/*"
             action = Intent.ACTION_OPEN_DOCUMENT
             addCategory(Intent.CATEGORY_OPENABLE)
         }
