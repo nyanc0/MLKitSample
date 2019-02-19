@@ -5,6 +5,7 @@ import android.os.Environment
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.core.content.FileProvider
+import com.sample.mlkit.android.nyanc0.mlkitsample.BuildConfig
 import com.sample.mlkit.android.nyanc0.mlkitsample.MLKitSampleApplication
 import java.io.File
 import java.text.SimpleDateFormat
@@ -34,8 +35,13 @@ data class Photo(private val file: File,private val uri: Uri) : Parcelable {
                 storageDir.mkdir()
             }
             return File.createTempFile(prefix + timeStamp, ".jpg", storageDir)
+
+//            val fileName = "IMG_$timeStamp.jpg"
+//            val filePath = getExternalStorageDirPath("/nyanc0") + "/" + fileName
+//            return FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider")
+
 //            mMediaFileDto.fileName = getString(R.string.save_photo_file_name, mMediaFileDto.title)
-//            mMediaFileDto.path = (FileUtil.getExternalStorageDirPath("/Carsensor") + "/"
+//            mMediaFileDto.path = (FileUtil.getExternalStorageDirPath("/nyanc0") + "/"
 //                    + mMediaFileDto.fileName)
 //
 //            return FileProvider.getUriForFile(
@@ -66,6 +72,41 @@ data class Photo(private val file: File,private val uri: Uri) : Parcelable {
         fun createPhoto(file: File) : Photo {
             return Photo(file, createUri(file))
         }
+
+        /**
+         * 写真用Photo作成
+         */
+        fun createPhoto() : Photo {
+            val fileName = "IMG_$timeStamp.jpg"
+            val filePath = getExternalStorageDirPath("/nyanc0") + "/" + fileName
+            val file = File(filePath)
+            val uri = FileProvider.getUriForFile(MLKitSampleApplication.applicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider", file)
+            return Photo(file, uri)
+        }
+
+        private fun getExternalStorageDirPath(makeDir: String?): String? {
+            var makeDir = makeDir
+            var dirPath = ""
+            var photoDir: File? = null
+            val extStorageDir = Environment.getExternalStorageDirectory()
+            if (extStorageDir.canWrite()) {
+                if (makeDir == null) {
+                    makeDir = ""
+                }
+                photoDir = File(extStorageDir.path + makeDir)
+            }
+
+            if (photoDir != null) {
+                if (!photoDir.exists() && !photoDir.mkdirs()) {
+                    return null
+                }
+                if (photoDir.canWrite()) {
+                    dirPath = photoDir.path
+                }
+            }
+            return dirPath
+        }
+
     }
 
     @JvmField

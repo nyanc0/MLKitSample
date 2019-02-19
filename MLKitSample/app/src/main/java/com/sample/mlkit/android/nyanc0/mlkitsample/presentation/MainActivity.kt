@@ -2,6 +2,7 @@ package com.sample.mlkit.android.nyanc0.mlkitsample.presentation
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
@@ -102,6 +103,16 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         when (requestCode) {
             REQUEST_CAMERA -> {
                 if (resultCode == Activity.RESULT_OK) {
+
+                    var captured : Uri?
+                    if (data != null && data.data != null) {
+                        captured = data.data
+                    }
+
+
+
+
+
                     CropActivity.startForResult(this, tmpPhoto)
                 }
             }
