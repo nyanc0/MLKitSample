@@ -13,8 +13,8 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
 
     private val lock = Any()
     private val graphics = mutableListOf<Graphic>()
-    var previewWidth = 0
-    var previewHeight = 0
+    var targetWidth = 0
+    var targetHeight = 0
     private val rect = RectF()
 
     private val rectPaint = Paint().apply {
@@ -51,12 +51,16 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
+        val offsetX = (width - targetWidth) * 0.5f
+        val offsetY = (height - targetHeight) * 0.5f
+
         synchronized(lock) {
             for (graphic in graphics) {
                 when (graphic) {
                     is BoxGraphic -> {
                         rect.set(graphic.boundingBox)
-                        rect.offset(0.5f, 0.5f)
+                        rect.offset(offsetX, offsetY)
                         canvas.drawRect(rect, rectPaint)
 
                         if (graphic.text.isNotEmpty()) {

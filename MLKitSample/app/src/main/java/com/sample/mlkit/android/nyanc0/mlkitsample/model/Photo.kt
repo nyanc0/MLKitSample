@@ -5,12 +5,13 @@ import android.os.Environment
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.core.content.FileProvider
+import com.sample.mlkit.android.nyanc0.mlkitsample.BuildConfig
 import com.sample.mlkit.android.nyanc0.mlkitsample.MLKitSampleApplication
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-data class Photo(private val file: File,private val uri: Uri) : Parcelable {
+data class Photo(private val file: File, private val uri: Uri) : Parcelable {
 
     val photoFile: File = file
 
@@ -26,36 +27,69 @@ data class Photo(private val file: File,private val uri: Uri) : Parcelable {
     }
 
     companion object {
-        private val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.JAPAN).format(Date())
-
-        fun createTmpFile(prefix: String): File {
-            val storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM + "/temp")
-            if (!storageDir.exists()) {
-                storageDir.mkdir()
-            }
-            return File.createTempFile(prefix + timeStamp, ".jpg", storageDir)
-        }
 
         private fun createUri(file: File): Uri {
             return FileProvider.getUriForFile(
                 MLKitSampleApplication.applicationContext(),
-                MLKitSampleApplication.applicationContext().packageName + ".fileprovider",
+                BuildConfig.APPLICATION_ID + ".fileprovider",
                 file
             )
         }
 
-        fun createPhoto(prefix: String) : Photo {
-            val file = createTmpFile(prefix)
+        fun createPhotoFile(): File {
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.JAPAN).format(Date())
+            val fileName = "IMG_$timeStamp.jpg"
+            val filePath = getExternalStorageDirPath("/nyanc0") + "/" + fileName
+            return File(filePath)
+        }
+
+        /**
+         * カメラ用のPhotoを作成
+         */
+        fun createPhotoForCamera(): Photo {
+            val file = createPhotoFile()
             val uri = createUri(file)
             return Photo(file, uri)
         }
 
-        fun createPhoto(uri: Uri) : Photo {
+        /**
+         * ライブラリから取得した画像用
+         */
+        fun createPhotoForLibraryCrop(uri: Uri): Photo {
             return Photo(File(uri.path), uri)
         }
 
-        fun createPhoto(file: File) : Photo {
+        /**
+         * キャプチャ後の画像用
+         */
+        fun createPhotoForCropped(file: File): Photo {
             return Photo(file, createUri(file))
+        }
+
+        /**
+         * 外部レポジトリの取得
+         */
+        private fun getExternalStorageDirPath(makeDir: String?): String? {
+            var makeDir = makeDir
+            var dirPath = ""
+            var photoDir: File? = null
+            val extStorageDir = Environment.getExternalStorageDirectory()
+            if (extStorageDir.canWrite()) {
+                if (makeDir == null) {
+                    makeDir = ""
+                }
+                photoDir = File(extStorageDir.path + makeDir)
+            }
+
+            if (photoDir != null) {
+                if (!photoDir.exists() && !photoDir.mkdirs()) {
+                    return null
+                }
+                if (photoDir.canWrite()) {
+                    dirPath = photoDir.path
+                }
+            }
+            return dirPath
         }
 
         @JvmField

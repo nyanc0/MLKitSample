@@ -2,6 +2,7 @@ package com.sample.mlkit.android.nyanc0.mlkitsample.presentation
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
@@ -22,11 +23,9 @@ import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.crop.CropActivit
 import com.sample.mlkit.android.nyanc0.mlkitsample.repository.FirebaseRepository
 import com.sample.mlkit.android.nyanc0.mlkitsample.repository.Result
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.max
 
 class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedListener, CoroutineScope,
     AdapterView.OnItemSelectedListener {
@@ -61,9 +60,10 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
 
         binding.detectBtn.setOnClickListener {
             launch(Dispatchers.Main) {
+
+                binding.overlay.clear()
                 val firebaseRepository = FirebaseRepository(coroutineContext)
                 val result = firebaseRepository.detect(croppedPhoto, selectedDetector).await()
-                binding.overlay.clear()
                 when (result) {
                     is Result.Success -> {
                         for (graphic in result.data) {
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             REQUEST_CHOOSE_IMAGE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     data?.data?.let {
-                        tmpPhoto = Photo.createPhoto(it)
+                        tmpPhoto = Photo.createPhotoForLibraryCrop(it)
                         CropActivity.startForResult(this, tmpPhoto)
                     }
                 }
@@ -116,10 +116,40 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             CropActivity.REQUEST_CD -> {
                 if (resultCode == Activity.RESULT_OK) {
                     croppedPhoto = data!!.getParcelableExtra(CropActivity.KEY_RESULT_INTENT)
-                    Glide.with(binding.mainImage.context).load(croppedPhoto.fileUri).into(binding.mainImage)
+                    var bitmap: Bitmap? = null
+                    launch {
+                        bitmap = resizeBitmap(croppedPhoto)
+                        binding.mainImage.setImageBitmap(bitmap)
+                        binding.overlay.clear()
+                        binding.overlay.targetWidth = bitmap!!.width
+                        binding.overlay.targetHeight = bitmap!!.height
+                    }
                 }
             }
         }
+    }
+
+    private suspend fun resizeBitmap(photo: Photo): Bitmap = withContext(Dispatchers.Default) {
+        val imageBitmap: Bitmap = Glide.with(binding.mainImage.context)
+            .asBitmap()
+            .load(photo.fileUri)
+            .submit(binding.mainImage.width, binding.mainImage.height)
+            .get()
+
+        val scaleFactor = max(
+            imageBitmap.width.toFloat() / binding.mainImage.width.toFloat(),
+            imageBitmap.height.toFloat() / binding.mainImage.height.toFloat()
+        )
+
+        val targetWidth = (imageBitmap.width / scaleFactor).toInt()
+        val targetHeight = (imageBitmap.height / scaleFactor).toInt()
+
+        Bitmap.createScaledBitmap(
+            imageBitmap,
+            targetWidth,
+            targetHeight,
+            true
+        )
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -168,7 +198,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             return
         }
 
-        tmpPhoto = Photo.createPhoto(TMP_PHOTO_PREFIX)
+        tmpPhoto = Photo.createPhotoForCamera()
 
         val intent = Intent().apply {
             action = MediaStore.ACTION_IMAGE_CAPTURE
@@ -202,6 +232,5 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         const val PERMISSION_CHOOSE_IMAGE = 1001
         const val REQUEST_CAMERA = 1002
         const val REQUEST_CHOOSE_IMAGE = 1003
-        const val TMP_PHOTO_PREFIX = "nyanc0_"
     }
 }

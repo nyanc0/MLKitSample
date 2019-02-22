@@ -112,7 +112,7 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
         cropped!!.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputSystem)
         byteArrayOutputSystem.close()
 
-        val saveFile = Photo.createTmpFile(PHOTO_PREFIX)
+        val saveFile = Photo.createPhotoFile()
         val fileOutputStream = FileOutputStream(saveFile)
         fileOutputStream.write(byteArrayOutputSystem.toByteArray())
         fileOutputStream.close()
@@ -120,14 +120,13 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
         // トリミング前の写真を削除
         deleteExistFile(temPhoto.photoFile)
 
-        return@async Photo.createPhoto(saveFile)
+        return@async Photo.createPhotoForCropped(saveFile)
     }
 
     companion object {
         const val REQUEST_CD = 2000
         const val KEY_INTENT = "key_crop_image"
         const val KEY_RESULT_INTENT = "key_cropped_image"
-        const val PHOTO_PREFIX = "cropped_"
 
         fun startForResult(activity: Activity, photo: Photo) {
             val intent = Intent(activity, CropActivity::class.java)

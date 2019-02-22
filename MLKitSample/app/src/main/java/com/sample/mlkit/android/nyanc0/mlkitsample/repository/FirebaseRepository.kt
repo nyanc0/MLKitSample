@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.cloud.FirebaseVisionCloudDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.firebase.ml.vision.text.FirebaseVisionCloudTextRecognizerOptions
 import com.sample.mlkit.android.nyanc0.mlkitsample.model.Detector
 import com.sample.mlkit.android.nyanc0.mlkitsample.model.Photo
@@ -75,7 +76,13 @@ class FirebaseRepository(override val coroutineContext: CoroutineContext) : Coro
                         }
                 }
                 Detector.FACE_DETECTION -> {
-                    firebaseVision.visionFaceDetector
+                    val highAccuracyOpts = FirebaseVisionFaceDetectorOptions.Builder()
+                        .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                        .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                        .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                        .enableTracking()
+                        .build()
+                    firebaseVision.getVisionFaceDetector(highAccuracyOpts)
                         .detectInImage(image)
                         .addOnSuccessListener { faces ->
                             val result = mutableListOf<Graphic>()
