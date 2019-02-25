@@ -3,4 +3,5 @@
 
     <string name="cropped_error">トリミングに失敗しました</string>
     <string name="save_photo_file_name">IMG_%1$s.jpg</string>
+    <string name="label_detect">Detect</string>
 </resources>

@@ -52,8 +52,8 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val offsetX = (width - targetWidth) * 0.5f
-        val offsetY = (height - targetHeight) * 0.5f
+        val offsetX = (canvas.width - targetWidth) * 0.25f
+        val offsetY = (canvas.height - targetHeight) * 0.25f
 
         synchronized(lock) {
             for (graphic in graphics) {
