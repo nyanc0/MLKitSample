@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 
 
@@ -52,8 +53,13 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val offsetX = (canvas.width - targetWidth) * 0.25f
-        val offsetY = (canvas.height - targetHeight) * 0.25f
+        val offsetX = (canvas.width - targetWidth) * 0.5f
+        val offsetY = (canvas.height - targetHeight) * 0.5f
+
+        Log.d("MLKitLog", "canvas.width: " + canvas.width.toString())
+        Log.d("MLKitLog", "canvas.height: " + canvas.height.toString())
+        Log.d("MLKitLog", "offsetX: " + offsetX.toString())
+        Log.d("MLKitLog", "offsetY: " + offsetY.toString())
 
         synchronized(lock) {
             for (graphic in graphics) {

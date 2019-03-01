@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
     private lateinit var tmpPhoto: Photo
     /** トリミング後の画像 */
     private lateinit var croppedPhoto: Photo
+    /** ImageViewにセットするBitmap */
+    private var bitmap: Bitmap? = null
     /** 選択中のDetector */
     private var selectedDetector: Detector = Detector.TEXT_DETECTION
     private lateinit var job: Job
@@ -57,24 +59,9 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
                         setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     }
         binding.detectorSpinner.onItemSelectedListener = this
-
         binding.detectBtn.setOnClickListener {
-            launch(Dispatchers.Main) {
-
-                binding.overlay.clear()
-                val firebaseRepository = FirebaseRepository(coroutineContext)
-                val result = firebaseRepository.detect(croppedPhoto, selectedDetector).await()
-                when (result) {
-                    is Result.Success -> {
-                        for (graphic in result.data) {
-                            overlay.add(graphic)
-                        }
-                    }
-                    is Result.Failure -> {
-                        Toast.makeText(this@MainActivity, result.errorMessage, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
+            binding.overlay.clear()
+            bitmap?.let { detect(it) }
         }
     }
 
@@ -116,11 +103,10 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             CropActivity.REQUEST_CD -> {
                 if (resultCode == Activity.RESULT_OK) {
                     croppedPhoto = data!!.getParcelableExtra(CropActivity.KEY_RESULT_INTENT)
-                    var bitmap: Bitmap? = null
                     launch {
+                        binding.overlay.clear()
                         bitmap = resizeBitmap(croppedPhoto)
                         binding.mainImage.setImageBitmap(bitmap)
-                        binding.overlay.clear()
                         binding.overlay.targetWidth = bitmap!!.width
                         binding.overlay.targetHeight = bitmap!!.height
                     }
@@ -129,6 +115,25 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            PERMISSION_CAMERA -> {
+                if (verifyGrantResults(grantResults)) {
+                    startCamera()
+                }
+            }
+            PERMISSION_CHOOSE_IMAGE -> {
+                if (verifyGrantResults(grantResults)) {
+                    startLibrary()
+                }
+            }
+        }
+    }
+
+    /**
+     * BitmapのサイズをImageViewの幅を基準にアスペクト比を維持したままリサイズする.
+     */
     private suspend fun resizeBitmap(photo: Photo): Bitmap = withContext(Dispatchers.Default) {
         val imageBitmap: Bitmap = Glide.with(binding.mainImage.context)
             .asBitmap()
@@ -150,22 +155,6 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             targetHeight,
             true
         )
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            PERMISSION_CAMERA -> {
-                if (verifyGrantResults(grantResults)) {
-                    startCamera()
-                }
-            }
-            PERMISSION_CHOOSE_IMAGE -> {
-                if (verifyGrantResults(grantResults)) {
-                    startLibrary()
-                }
-            }
-        }
     }
 
     /**
@@ -225,6 +214,24 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             addCategory(Intent.CATEGORY_OPENABLE)
         }
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CHOOSE_IMAGE)
+    }
+
+    /**
+     * 解析実施
+     */
+    private fun detect(imageBitmap: Bitmap) = launch(Dispatchers.Main) {
+        val firebaseRepository = FirebaseRepository(coroutineContext)
+        val result = firebaseRepository.detect(imageBitmap, selectedDetector).await()
+        when (result) {
+            is Result.Success -> {
+                for (graphic in result.data) {
+                    overlay.add(graphic)
+                }
+            }
+            is Result.Failure -> {
+                Toast.makeText(this@MainActivity, result.errorMessage, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     companion object {
