@@ -220,7 +220,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
      * 解析実施
      */
     private fun detect(imageBitmap: Bitmap) = launch(Dispatchers.Main) {
-        val firebaseRepository = FirebaseRepository(coroutineContext)
+        val firebaseRepository = FirebaseRepository()
         val result = firebaseRepository.detect(imageBitmap, selectedDetector).await()
         when (result) {
             is Result.Success -> {

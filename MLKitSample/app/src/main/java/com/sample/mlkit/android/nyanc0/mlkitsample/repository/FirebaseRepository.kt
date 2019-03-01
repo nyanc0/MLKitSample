@@ -9,16 +9,14 @@ import com.google.firebase.ml.vision.text.FirebaseVisionCloudTextRecognizerOptio
 import com.sample.mlkit.android.nyanc0.mlkitsample.model.Detector
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.BoxGraphic
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.Graphic
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class FirebaseRepository(override val coroutineContext: CoroutineContext) : CoroutineScope {
-
-    fun detect(bitmap: Bitmap, detector: Detector) = async(Dispatchers.Default) {
+class FirebaseRepository {
+    fun detect(bitmap: Bitmap, detector: Detector) = GlobalScope.async(Dispatchers.Default) {
         val image = FirebaseVisionImage.fromBitmap(bitmap)
         val firebaseVision = FirebaseVision.getInstance()
 
@@ -106,5 +104,4 @@ class FirebaseRepository(override val coroutineContext: CoroutineContext) : Coro
             }
         }
     }
-
 }
