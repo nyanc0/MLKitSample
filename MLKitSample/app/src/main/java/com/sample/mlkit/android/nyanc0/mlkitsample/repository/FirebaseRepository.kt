@@ -1,6 +1,7 @@
 package com.sample.mlkit.android.nyanc0.mlkitsample.repository
 
 import android.graphics.Bitmap
+import androidx.annotation.WorkerThread
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.cloud.FirebaseVisionCloudDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -9,19 +10,18 @@ import com.google.firebase.ml.vision.text.FirebaseVisionCloudTextRecognizerOptio
 import com.sample.mlkit.android.nyanc0.mlkitsample.model.Detector
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.BoxGraphic
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.Graphic
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class FirebaseRepository {
-    fun detect(bitmap: Bitmap, detector: Detector) = GlobalScope.async(Dispatchers.Default) {
+object FirebaseRepository {
+
+    @WorkerThread
+    suspend fun startFirebase(bitmap: Bitmap, detector: Detector): Result<MutableList<Graphic>> {
+
         val image = FirebaseVisionImage.fromBitmap(bitmap)
         val firebaseVision = FirebaseVision.getInstance()
 
-        return@async suspendCoroutine<Result<MutableList<Graphic>>> { cont ->
-
+        return suspendCoroutine { cont ->
             when (detector) {
                 Detector.TEXT_DETECTION -> {
                     firebaseVision.onDeviceTextRecognizer

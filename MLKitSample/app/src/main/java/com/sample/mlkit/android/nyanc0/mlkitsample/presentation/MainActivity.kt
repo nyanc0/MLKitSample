@@ -2,7 +2,7 @@ package com.sample.mlkit.android.nyanc0.mlkitsample.presentation
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
@@ -11,36 +11,39 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.bumptech.glide.Glide
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.sample.mlkit.android.nyanc0.mlkitsample.R
 import com.sample.mlkit.android.nyanc0.mlkitsample.databinding.ActivityMainBinding
 import com.sample.mlkit.android.nyanc0.mlkitsample.model.Detector
 import com.sample.mlkit.android.nyanc0.mlkitsample.model.ImageSelection
-import com.sample.mlkit.android.nyanc0.mlkitsample.model.Photo
 import com.sample.mlkit.android.nyanc0.mlkitsample.permission.*
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.bottomsheet.BottomSheetFragment
+import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.createFile
+import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.createUri
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.crop.CropActivity
-import com.sample.mlkit.android.nyanc0.mlkitsample.repository.FirebaseRepository
-import com.sample.mlkit.android.nyanc0.mlkitsample.repository.Result
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.max
 
 class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedListener, CoroutineScope,
     AdapterView.OnItemSelectedListener {
 
-    /** カメラ/ライブラリから取得した写真 */
-    private lateinit var tmpPhoto: Photo
-    /** トリミング後の画像 */
-    private lateinit var croppedPhoto: Photo
-    /** ImageViewにセットするBitmap */
-    private var bitmap: Bitmap? = null
     /** 選択中のDetector */
     private var selectedDetector: Detector = Detector.TEXT_DETECTION
+    /** カメラで撮影したURI */
+    private lateinit var cameraUri: Uri
+
     private lateinit var job: Job
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
+
+    private val viewModel by lazy {
+        ViewModelProviders.of(this).get(MainViewModel::class.java)
+    }
 
     private val binding: ActivityMainBinding by lazy {
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
@@ -48,21 +51,41 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         job = Job()
+
         binding.selectImageBtn.setOnClickListener {
             showBottomSheet()
         }
-
+        binding.detectorSpinner.onItemSelectedListener = this
         binding.detectorSpinner.adapter =
                 ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, Detector.createTitleList())
                     .apply {
                         setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     }
-        binding.detectorSpinner.onItemSelectedListener = this
+
         binding.detectBtn.setOnClickListener {
-            binding.overlay.clear()
-            bitmap?.let { detect(it) }
+            viewModel.detect(selectedDetector)
         }
+
+        // Bitmap
+        viewModel.bitmap.observe(this, Observer { bitmap ->
+            bitmap?.let {
+                binding.mainImage.setImageBitmap(bitmap)
+                binding.overlay.targetWidth = bitmap.width
+                binding.overlay.targetHeight = bitmap.height
+            }
+        })
+
+        // 解析結果
+        viewModel.graphics.observe(this, Observer { graphics ->
+            binding.overlay.clear()
+            graphics?.let {
+                for (graphic in it) {
+                    overlay.add(graphic)
+                }
+            }
+        })
     }
 
     override fun onItemSelected(item: ImageSelection) {
@@ -89,26 +112,20 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         when (requestCode) {
             REQUEST_CAMERA -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    CropActivity.startForResult(this, tmpPhoto)
+                    CropActivity.startForResult(this, cameraUri)
                 }
             }
             REQUEST_CHOOSE_IMAGE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    data?.data?.let {
-                        tmpPhoto = Photo.createPhotoForLibraryCrop(it)
-                        CropActivity.startForResult(this, tmpPhoto)
-                    }
+                data?.data?.let {
+                    CropActivity.startForResult(this, it)
                 }
             }
             CropActivity.REQUEST_CD -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    croppedPhoto = data!!.getParcelableExtra(CropActivity.KEY_RESULT_INTENT)
+                    val croppedUri: Uri = data!!.getParcelableExtra(CropActivity.KEY_RESULT_INTENT)
                     launch {
                         binding.overlay.clear()
-                        bitmap = resizeBitmap(croppedPhoto)
-                        binding.mainImage.setImageBitmap(bitmap)
-                        binding.overlay.targetWidth = bitmap!!.width
-                        binding.overlay.targetHeight = bitmap!!.height
+                        viewModel.setBitmap(croppedUri, binding.mainImage.width, binding.mainImage.height)
                     }
                 }
             }
@@ -131,31 +148,6 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         }
     }
 
-    /**
-     * BitmapのサイズをImageViewの幅を基準にアスペクト比を維持したままリサイズする.
-     */
-    private suspend fun resizeBitmap(photo: Photo): Bitmap = withContext(Dispatchers.Default) {
-        val imageBitmap: Bitmap = Glide.with(binding.mainImage.context)
-            .asBitmap()
-            .load(photo.fileUri)
-            .submit(binding.mainImage.width, binding.mainImage.height)
-            .get()
-
-        val scaleFactor = max(
-            imageBitmap.width.toFloat() / binding.mainImage.width.toFloat(),
-            imageBitmap.height.toFloat() / binding.mainImage.height.toFloat()
-        )
-
-        val targetWidth = (imageBitmap.width / scaleFactor).toInt()
-        val targetHeight = (imageBitmap.height / scaleFactor).toInt()
-
-        Bitmap.createScaledBitmap(
-            imageBitmap,
-            targetWidth,
-            targetHeight,
-            true
-        )
-    }
 
     /**
      * BottomSheetを表示する
@@ -186,14 +178,12 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         if (!checkCameraPermission(PERMISSION_CAMERA)) {
             return
         }
-
-        tmpPhoto = Photo.createPhotoForCamera()
-
+        cameraUri = createUri(createFile())
         val intent = Intent().apply {
             action = MediaStore.ACTION_IMAGE_CAPTURE
             flags = Intent.FLAG_ACTIVITY_NO_HISTORY
             addCategory(Intent.CATEGORY_DEFAULT)
-            this.putExtra(MediaStore.EXTRA_OUTPUT, tmpPhoto.fileUri)
+            this.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri)
         }
 
         startActivityForResult(intent, REQUEST_CAMERA)
@@ -214,24 +204,6 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             addCategory(Intent.CATEGORY_OPENABLE)
         }
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CHOOSE_IMAGE)
-    }
-
-    /**
-     * 解析実施
-     */
-    private fun detect(imageBitmap: Bitmap) = launch(Dispatchers.Main) {
-        val firebaseRepository = FirebaseRepository()
-        val result = firebaseRepository.detect(imageBitmap, selectedDetector).await()
-        when (result) {
-            is Result.Success -> {
-                for (graphic in result.data) {
-                    overlay.add(graphic)
-                }
-            }
-            is Result.Failure -> {
-                Toast.makeText(this@MainActivity, result.errorMessage, Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     companion object {
