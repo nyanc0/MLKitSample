@@ -24,6 +24,7 @@ import kotlin.coroutines.CoroutineContext
 
 class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnClickListener, CoroutineScope {
 
+    /** トリミング前の画像URI */
     private lateinit var tmpUri: Uri
     private lateinit var job: Job
     override val coroutineContext: CoroutineContext
@@ -94,9 +95,10 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
      */
     private fun returnCroppedPhoto(cropped: Bitmap?) = launch(Dispatchers.Main) {
         val savedUri = saveImage(cropped).await()
-        val intent = Intent()
-        intent.putExtra(KEY_RESULT_INTENT, savedUri)
-        setResult(Activity.RESULT_OK, intent)
+        Intent().let {
+            it.putExtra(KEY_RESULT_INTENT, savedUri)
+            setResult(Activity.RESULT_OK, it)
+        }
         finish()
     }
 
@@ -108,8 +110,10 @@ class CropActivity : AppCompatActivity(), CropCallback, LoadCallback, View.OnCli
     private fun saveImage(cropped: Bitmap?) = async(Dispatchers.Default) {
 
         val byteArrayOutputSystem = ByteArrayOutputStream()
-        cropped!!.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputSystem)
-        byteArrayOutputSystem.close()
+        cropped?.let {
+            it.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputSystem)
+            byteArrayOutputSystem.close()
+        }
 
         val saveFile = createFile()
         val fileOutputStream = FileOutputStream(saveFile)

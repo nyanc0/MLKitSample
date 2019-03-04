@@ -6,10 +6,11 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 
-
+/**
+ * Bitmap上に解析結果をだすOverlay
+ */
 class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private val lock = Any()
@@ -56,11 +57,6 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
         val offsetX = (canvas.width - targetWidth) * 0.5f
         val offsetY = (canvas.height - targetHeight) * 0.5f
 
-        Log.d("MLKitLog", "canvas.width: " + canvas.width.toString())
-        Log.d("MLKitLog", "canvas.height: " + canvas.height.toString())
-        Log.d("MLKitLog", "offsetX: " + offsetX.toString())
-        Log.d("MLKitLog", "offsetY: " + offsetY.toString())
-
         synchronized(lock) {
             for (graphic in graphics) {
                 when (graphic) {
@@ -68,7 +64,6 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
                         rect.set(graphic.boundingBox)
                         rect.offset(offsetX, offsetY)
                         canvas.drawRect(rect, rectPaint)
-
                         if (graphic.text.isNotEmpty()) {
                             canvas.drawText(graphic.text, rect.left, rect.bottom, textPaint)
                         }

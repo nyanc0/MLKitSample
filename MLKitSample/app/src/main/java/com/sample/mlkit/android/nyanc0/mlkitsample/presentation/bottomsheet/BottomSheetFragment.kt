@@ -78,6 +78,9 @@ class BottomSheetFragment : BottomSheetDialogFragment(),
         return false
     }
 
+    /**
+     * BottomSheetが選択された時のコールバック
+     */
     interface OnItemSelectedListener {
         fun onItemSelected(item: ImageSelection)
     }

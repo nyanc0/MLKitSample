@@ -13,8 +13,18 @@ import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.Graphic
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Firebaseへ解析を行うRepository
+ */
 object FirebaseRepository {
 
+    /**
+     * 解析を実施.
+     *
+     * @param bitmap 解析する画像
+     * @param detector 解析する内容
+     * @return Result<MutableList<Graphic>>
+     */
     @WorkerThread
     suspend fun startFirebase(bitmap: Bitmap, detector: Detector): Result<MutableList<Graphic>> {
 

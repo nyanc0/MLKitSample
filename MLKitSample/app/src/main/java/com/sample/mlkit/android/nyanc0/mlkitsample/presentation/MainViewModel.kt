@@ -15,12 +15,19 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 
+/**
+ * MainActivityのViewModel
+ */
 class MainViewModel : ViewModel(), CoroutineScope {
 
+    /** 解析結果(private) */
     private val mutableGraphics: MutableLiveData<MutableList<Graphic>?> = MutableLiveData()
+    /** 解析結果.ViewはこちらをObserveする */
     val graphics: LiveData<MutableList<Graphic>?> = mutableGraphics
 
+    /** 解析結果(private) */
     private val mutableBitmap: MutableLiveData<Bitmap> = MutableLiveData()
+    /** 解析結果.ViewはこちらをObserveする */
     val bitmap: LiveData<Bitmap> = mutableBitmap
 
     private val job: Job = Job()
@@ -32,6 +39,11 @@ class MainViewModel : ViewModel(), CoroutineScope {
         job.cancel()
     }
 
+    /**
+     * 解析開始.
+     *
+     * @param detector 解析内容
+     */
     fun detect(detector: Detector) {
         bitmap.value?.let {
             launch {
@@ -50,6 +62,15 @@ class MainViewModel : ViewModel(), CoroutineScope {
         }
     }
 
+    /**
+     * Bitmapをリサイズしてセットする.<br>
+     * Viewはbitmapをobserveして結果を受け取る.
+     *
+     * @see MainViewModel.bitmap
+     * @param uri 表示する画像のURI
+     * @param width 表示先ImageViewの横幅
+     * @param height 表示先ImageViewの縦幅
+     */
     fun setBitmap(uri: Uri, width: Int, height: Int) {
         launch {
             val result = resizeBitmap(uri, width, height)
@@ -57,6 +78,13 @@ class MainViewModel : ViewModel(), CoroutineScope {
         }
     }
 
+    /**
+     * Bitmapをアスペクト比を維持したままリサイズする.
+     *
+     * @param width 表示先ImageViewの横幅
+     * @param height 表示先ImageViewの縦幅
+     * @return Bitmap
+     */
     private suspend fun resizeBitmap(uri: Uri, width: Int, height: Int): Bitmap =
         withContext(Dispatchers.Default) {
 
@@ -65,7 +93,6 @@ class MainViewModel : ViewModel(), CoroutineScope {
                 .load(uri)
                 .submit(width, height)
                 .get()
-
 
             val scaleFactor = max(
                 imageBitmap.width.toFloat() / width.toFloat(),

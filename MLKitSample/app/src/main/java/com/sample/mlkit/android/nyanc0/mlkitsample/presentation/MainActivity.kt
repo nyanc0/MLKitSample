@@ -26,7 +26,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedListener, CoroutineScope,
@@ -122,10 +121,9 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             }
             CropActivity.REQUEST_CD -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val croppedUri: Uri = data!!.getParcelableExtra(CropActivity.KEY_RESULT_INTENT)
-                    launch {
+                    data?.getParcelableExtra<Uri>(CropActivity.KEY_RESULT_INTENT)?.let {
                         binding.overlay.clear()
-                        viewModel.setBitmap(croppedUri, binding.mainImage.width, binding.mainImage.height)
+                        viewModel.setBitmap(it, binding.mainImage.width, binding.mainImage.height)
                     }
                 }
             }
@@ -150,7 +148,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
 
 
     /**
-     * BottomSheetを表示する
+     * BottomSheetを表示する.
      */
     private fun showBottomSheet() {
         BottomSheetFragment.newInstance().show(supportFragmentManager, BottomSheetFragment.TAG)
@@ -172,7 +170,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
     }
 
     /**
-     * カメラ起動
+     * カメラ起動.
      */
     private fun startCamera() {
         if (!checkCameraPermission(PERMISSION_CAMERA)) {
@@ -190,7 +188,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
     }
 
     /**
-     * ライブラリ起動
+     * ライブラリ起動.
      */
     private fun startLibrary() {
 
@@ -199,11 +197,11 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         }
 
         val intent = Intent().apply {
-            type = "image/*"
+            type = IMAGE_TYPE
             action = Intent.ACTION_OPEN_DOCUMENT
             addCategory(Intent.CATEGORY_OPENABLE)
         }
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CHOOSE_IMAGE)
+        startActivityForResult(Intent.createChooser(intent, CHOOSER_TITLE), REQUEST_CHOOSE_IMAGE)
     }
 
     companion object {
@@ -211,5 +209,7 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
         const val PERMISSION_CHOOSE_IMAGE = 1001
         const val REQUEST_CAMERA = 1002
         const val REQUEST_CHOOSE_IMAGE = 1003
+        private const val IMAGE_TYPE = "image/*"
+        private const val CHOOSER_TITLE = "Select Picture"
     }
 }
