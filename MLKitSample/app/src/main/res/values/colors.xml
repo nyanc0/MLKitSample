@@ -8,4 +8,5 @@
     <color name="textSecondary">#757575</color>
     <color name="black">#000000</color>
     <color name="pressed_primary">#98cae2</color>
+    <color name="loading_bg">#66757575</color>
 </resources>
