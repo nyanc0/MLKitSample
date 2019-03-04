@@ -26,7 +26,7 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
     }
 
     private val textPaint = Paint().apply {
-        color = Color.WHITE
+        color = Color.BLUE
         textSize = 12 * resources.displayMetrics.density
     }
 

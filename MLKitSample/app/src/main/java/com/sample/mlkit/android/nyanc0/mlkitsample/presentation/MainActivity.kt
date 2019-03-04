@@ -64,6 +64,8 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
                     }
 
         binding.detectBtn.setOnClickListener {
+            binding.progress.visibility = View.VISIBLE
+            setEnable(false)
             viewModel.detect(selectedDetector)
         }
 
@@ -84,6 +86,8 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
                     overlay.add(graphic)
                 }
             }
+            binding.progress.visibility = View.GONE
+            setEnable(true)
         })
     }
 
@@ -202,6 +206,15 @@ class MainActivity : AppCompatActivity(), BottomSheetFragment.OnItemSelectedList
             addCategory(Intent.CATEGORY_OPENABLE)
         }
         startActivityForResult(Intent.createChooser(intent, CHOOSER_TITLE), REQUEST_CHOOSE_IMAGE)
+    }
+
+    /**
+     * ボタン/Spinnerのenable設定
+     */
+    private fun setEnable(isEnable: Boolean) {
+        binding.detectorSpinner.isEnabled = isEnable
+        binding.detectBtn.isEnabled = isEnable
+        binding.selectImageBtn.isEnabled = isEnable
     }
 
     companion object {
