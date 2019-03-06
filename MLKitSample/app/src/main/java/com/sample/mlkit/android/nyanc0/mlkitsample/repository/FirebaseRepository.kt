@@ -9,7 +9,6 @@ import com.google.firebase.ml.vision.cloud.FirebaseVisionCloudDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.firebase.ml.vision.label.FirebaseVisionCloudImageLabelerOptions
-import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceImageLabelerOptions
 import com.google.firebase.ml.vision.text.FirebaseVisionCloudTextRecognizerOptions
 import com.sample.mlkit.android.nyanc0.mlkitsample.model.Detector
 import com.sample.mlkit.android.nyanc0.mlkitsample.presentation.common.BoxGraphic
@@ -127,10 +126,7 @@ object FirebaseRepository {
 
                 }
                 Detector.LABELING -> {
-                    val options = FirebaseVisionOnDeviceImageLabelerOptions.Builder()
-                        .setConfidenceThreshold(0.7f)
-                        .build()
-                    firebaseVision.getOnDeviceImageLabeler(options)
+                    firebaseVision.onDeviceImageLabeler
                         .processImage(image)
                         .addOnSuccessListener { labels ->
                             val result = mutableListOf<Graphic>()

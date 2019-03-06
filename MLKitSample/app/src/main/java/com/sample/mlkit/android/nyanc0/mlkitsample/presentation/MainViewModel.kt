@@ -73,7 +73,7 @@ class MainViewModel : ViewModel(), CoroutineScope {
      */
     fun setBitmap(uri: Uri, width: Int, height: Int) {
         launch {
-            val result = resizeBitmap(uri, width, height)
+            val result: Bitmap = resizeBitmap(uri, width, height)
             mutableBitmap.postValue(result)
         }
     }
