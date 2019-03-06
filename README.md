@@ -55,4 +55,4 @@ implementation 'com.isseiaoki:simplecropview:1.1.8'
 
 ## データフロー
 
-<img border="0" src="MLKitSample_MainActivity.png" height="300">
+<img border="0" src="https://github.com/nyanc0/LT/blob/master/mlkit/images/MLKitSample_MainActivity.png?raw=true" height="300">
