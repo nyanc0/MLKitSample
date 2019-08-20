@@ -6,6 +6,8 @@ google-service.jsonはFirebaseプロジェクトからダウンロードして�
 
 <img border="0" src="https://github.com/nyanc0/LT/blob/master/mlkit/images/mlkit_1.gif?raw=true" height="600">
 
+画像へのオーバーレイ周りは[こちら](https://github.com/yanzm/MLKitSample)を参考にさせていただきました。
+
 ## 利用環境
 
 - Android Studio: 3.3
